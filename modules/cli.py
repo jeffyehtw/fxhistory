@@ -13,7 +13,7 @@ from modules.fxhistory import FxHistory
 from modules.statistics import Statistics
 
 # constant
-__version__ = '1.0'
+__version__ = '1.1'
 __description__ = 'A command line tool for foreign exchange'
 __epilog__ = 'Report bugs to <yehcj.tw@gmail.com>'
 
@@ -27,7 +27,9 @@ class Cli:
             description=__description__,
             epilog=__epilog__
         )
-        parser.add_argument('command', help='list')
+        parser.add_argument('command', help=define.strings.command_help.format(
+            command='list,state'
+        ))
         parser.add_argument(
             '-v', '-V', '--version',
             action='version',

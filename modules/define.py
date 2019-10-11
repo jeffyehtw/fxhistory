@@ -4,6 +4,7 @@ from __future__ import print_function
 class Strings:
     def __init__(self):
         self.date_help = '20190101'
+        self.command_help = 'choices: {command}'
         self.currency_help = 'choices: {currency}'
 
 class Define:
