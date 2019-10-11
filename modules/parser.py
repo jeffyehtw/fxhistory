@@ -4,6 +4,11 @@ from __future__ import print_function
 import os
 import csv
 import json
+import datetime
+
+from modules.define import Define
+
+define = Define()
 
 class Parser:
     def __init__(self):
@@ -11,25 +16,13 @@ class Parser:
             'date', 'USD/TWD', 'CYN/TWD', 'EUR/USD', 'USD/JPY', 'GBP/USD',
             'AUD/USD','USD/HKD', 'USD/CYN', 'USD/ZAR', 'NZD/USD'
         ]
-        self.currency = {
-            'USD': '美元',
-            'CYN': '人民幣',
-            'EUR': '歐元',
-            'JPY': '日幣',
-            'GBP': '英鎊',
-            'AUD': '澳幣',
-            'HKD': '港幣',
-            'ZAR': '南非幣',
-            'NZD': '紐幣',
-            'TWD': '新台幣',
-        }
-    
+
     def format(self, **kwargs):
         with open(kwargs['file'], 'r', encoding='big5') as file:
             lines = file.readlines()
 
-        for key in self.currency.keys():
-            lines[0] = lines[0].replace(self.currency[key], key)
+        for key in define.mapping.keys():
+            lines[0] = lines[0].replace(define.mapping[key], key)
 
         lines = [line.replace('／', '/') for line in lines]
         lines[0] = lines[0].replace('日期', 'date')
@@ -53,17 +46,24 @@ class Parser:
         # remove duplicated CYN
         for date in raw_data.keys():
             raw_data[date].pop('CYN/TWD')
-            for currency in raw_data[date].keys():
-                raw_data[date][currency] = float(raw_data[date][currency])
+
+        dates = list(raw_data.keys())
+        for date in dates:
+            new_date = datetime.datetime.strptime(date, '%Y/%m/%d')
+            new_date = new_date.strftime('%Y%m%d')
+            raw_data[new_date] = raw_data.pop(date)
 
         data = {}
         for date in raw_data.keys():
             data[date] = {}
             for key in raw_data[date].keys():
                 currency = key.split('/')
-                if currency[0] == 'USD':
-                    data[date][currency[1]] = raw_data[date][key]
-                else:
-                    data[date][currency[0]] = 1 / raw_data[date][key]
-
+                try:
+                    rate = float(raw_data[date][key])
+                    if currency[0] == 'USD':
+                        data[date][currency[1]] = str(rate)
+                    else:
+                        data[date][currency[0]] = str(1 / rate)
+                except:
+                    continue
         return data
