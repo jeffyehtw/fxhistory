@@ -198,6 +198,7 @@ class Cli:
 
             pyplot.plot_date(x, y, 'o-')
             pyplot.gcf().autofmt_xdate()
+            pyplot.title('USD/' + currency)
 
             if args.file == None:
                 pyplot.show()
