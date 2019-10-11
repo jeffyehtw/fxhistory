@@ -2,11 +2,13 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import sys
+import numpy
 import argparse
 import datetime
 
 from datetime import timedelta
 from tabulate import tabulate
+from matplotlib import pyplot
 
 from modules.define import Define
 from modules.fxhistory import FxHistory
@@ -139,3 +141,65 @@ class Cli:
         for date in data.keys():
             table.append([date] + [data[date][x] for x in args.currency])
         print(tabulate(table, headers=headers, tablefmt='github'))
+
+    def plot(self):
+        parser = argparse.ArgumentParser(description='')
+        parser.add_argument(
+            '-d', '--date',
+            nargs='+',
+            default=[
+                (datetime.datetime.now() - timedelta(30)).strftime('%Y%m%d'),
+                datetime.datetime.now().strftime('%Y%m%d'),
+            ],
+            help=define.strings.date_help
+        )
+        parser.add_argument(
+            '-c', '--currency',
+            nargs='+',
+            default=define.currency,
+            choices=define.currency,
+            metavar='CURRENCY',
+            help=define.strings.currency_help.format(
+                currency=', '.join(define.currency)
+            )
+        )
+        parser.add_argument(
+            '-f', '--file',
+            help='file'
+        )
+
+        args = parser.parse_args(sys.argv[2:])
+        try:
+            args.date[0] = datetime.datetime.strptime(args.date[0], '%Y%m%d')
+            args.date[1] = datetime.datetime.strptime(args.date[1], '%Y%m%d')
+        except:
+            parser.print_help()
+            exit()
+
+        if args.date[0] > args.date[1]:
+            parser.print_help()
+            exit()
+
+        data = fxhistory.list(
+            start=args.date[0],
+            end=args.date[1],
+            currency=args.currency
+        )
+
+        for currency in args.currency:
+            x = []
+            y = []
+            for date in data.keys():
+                try:
+                    x.append(datetime.datetime.strptime(date, '%Y%m%d'))
+                    y.append(float(data[date][currency]))
+                except:
+                    pass
+
+            pyplot.plot_date(x, y, 'o-')
+            pyplot.gcf().autofmt_xdate()
+
+            if args.file == None:
+                pyplot.show()
+            else:
+                pyplot.savefig(args.file, dpi=300)
