@@ -12,7 +12,7 @@ class Define:
         self.strings = Strings()
         self.currency = [
             'CYN', 'EUR', 'JPY', 'GBP', 'AUD',
-            'HKD', 'ZAR', 'NZD', 'TWD'
+            'HKD', 'ZAR', 'NZD', 'TWD', 'USD'
         ]
         self.mapping = {
             'USD': '美元',

@@ -56,6 +56,7 @@ class Parser:
         data = {}
         for date in raw_data.keys():
             data[date] = {}
+            data[date]['USD'] = '1'
             for key in raw_data[date].keys():
                 currency = key.split('/')
                 try:

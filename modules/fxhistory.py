@@ -56,7 +56,9 @@ class FxHistory:
                 ret[date] = {}
                 for currency in kwargs['currency']:
                     try:
-                        ret[date][currency] = self.history[date][currency]
+                        rate = float(self.history[date][currency])
+                        base = float(self.history[date][kwargs['base']])
+                        ret[date][currency] = 1 / rate * base
                     except:
                         ret[date][currency] = '-'
         return ret

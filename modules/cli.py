@@ -117,6 +117,12 @@ class Cli:
                 currency=', '.join(define.currency)
             )
         )
+        parser.add_argument(
+            '-b', '--base',
+            default='TWD',
+            choices=define.currency,
+            help='base'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         try:
@@ -133,7 +139,8 @@ class Cli:
         data = fxhistory.list(
             start=args.date[0],
             end=args.date[1],
-            currency=args.currency
+            currency=args.currency,
+            base=args.base
         )
 
         table = []
@@ -173,6 +180,12 @@ class Cli:
             default='line',
             help='type'
         )
+        parser.add_argument(
+            '-b', '--base',
+            choices=define.currency,
+            default='TWD',
+            help='base'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         try:
@@ -189,7 +202,8 @@ class Cli:
         data = fxhistory.list(
             start=args.date[0],
             end=args.date[1],
-            currency=args.currency
+            currency=args.currency,
+            base=args.base
         )
 
         if args.type == 'trend':
@@ -205,15 +219,21 @@ class Cli:
 
                 pyplot.plot_date(x, y, 'o-')
                 pyplot.gcf().autofmt_xdate()
-                pyplot.title('USD/' + currency)
+                pyplot.title(currency + '/' + args.base)
+
+                if args.file == None:
+                    pyplot.show()
+                else:
+                    pyplot.savefig(args.file, dpi=300)
+
         elif args.type == 'cdf':
             for currency in args.currency:
                 x = [float(data[date][currency]) for date in data.keys()]
                 x = [numpy.percentile(x, index) for index in range(0, 100)]
                 pyplot.plot(x, range(0, 100))
-                pyplot.title('USD/' + currency)
+                pyplot.title(currency + '/' + args.base)
 
-        if args.file == None:
-            pyplot.show()
-        else:
-            pyplot.savefig(args.file, dpi=300)
+                if args.file == None:
+                    pyplot.show()
+                else:
+                    pyplot.savefig(args.file, dpi=300)
