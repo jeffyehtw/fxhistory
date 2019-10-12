@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import os
+import glob
 import json
 import datetime
 
@@ -31,9 +32,9 @@ class FxHistory:
         self.dump()
 
     def load(self):
-        files = sorted(os.listdir('data/'))
+        files = sorted(glob.glob('data/*.json'))
         for file in files:
-            with open('data/' + file, 'r') as file:
+            with open(file, 'r') as file:
                 self.history.update(json.load(file))
 
     def dump(self):
