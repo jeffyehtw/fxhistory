@@ -167,6 +167,12 @@ class Cli:
             '-f', '--file',
             help='file'
         )
+        parser.add_argument(
+            '-t', '--type',
+            choices=['trend', 'cdf'],
+            default='line',
+            help='type'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         try:
@@ -186,21 +192,28 @@ class Cli:
             currency=args.currency
         )
 
-        for currency in args.currency:
-            x = []
-            y = []
-            for date in data.keys():
-                try:
-                    x.append(datetime.datetime.strptime(date, '%Y%m%d'))
-                    y.append(float(data[date][currency]))
-                except:
-                    pass
+        if args.type == 'trend':
+            for currency in args.currency:
+                x = []
+                y = []
+                for date in data.keys():
+                    try:
+                        x.append(datetime.datetime.strptime(date, '%Y%m%d'))
+                        y.append(float(data[date][currency]))
+                    except:
+                        pass
 
-            pyplot.plot_date(x, y, 'o-')
-            pyplot.gcf().autofmt_xdate()
-            pyplot.title('USD/' + currency)
+                pyplot.plot_date(x, y, 'o-')
+                pyplot.gcf().autofmt_xdate()
+                pyplot.title('USD/' + currency)
+        elif args.type == 'cdf':
+            for currency in args.currency:
+                x = [float(data[date][currency]) for date in data.keys()]
+                x = [numpy.percentile(x, index) for index in range(0, 100)]
+                pyplot.plot(x, range(0, 100))
+                pyplot.title('USD/' + currency)
 
-            if args.file == None:
-                pyplot.show()
-            else:
-                pyplot.savefig(args.file, dpi=300)
+        if args.file == None:
+            pyplot.show()
+        else:
+            pyplot.savefig(args.file, dpi=300)
