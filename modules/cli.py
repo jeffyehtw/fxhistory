@@ -217,7 +217,20 @@ class Cli:
                     except:
                         pass
 
-                pyplot.plot_date(x, y, 'o-')
+                kd = statistics.kd(data=y)
+
+                fig, ax1 = pyplot.subplots()
+                ax2 = ax1.twinx()
+
+                ax1.plot_date(x, y, 'o-', color='black', label='rate')
+                ax1.set_ylabel('dollar')
+
+                ax2.plot_date(x[9:], kd['k'][9:], '-', color='navy', label='k')
+                ax2.plot_date(x[9:], kd['d'][9:], '-', color='goldenrod', label='d')
+                ax2.set_ylabel('kd')
+
+                pyplot.legend(loc='upper right')
+
                 pyplot.gcf().autofmt_xdate()
                 pyplot.title(currency + '/' + args.base)
 
